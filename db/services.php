@@ -73,4 +73,12 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
+    'local_quickcards_submit_review' => [
+        'classname' => 'local_quickcards\\external\\submit_review',
+        'methodname' => 'execute',
+        'description' => 'Submit a flashcard review rating and update SM-2 schedule.',
+        'type' => 'write',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
 ];

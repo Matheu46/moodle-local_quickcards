@@ -22,3 +22,16 @@
 .quickcards-deck-view .border-start-4 {
     border-left-width: 4px;
 }
+
+.quickcards-study-session .study-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 0.75rem;
+}
+
+.quickcards-study-session #study-rating-buttons button {
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.quickcards-study-session #study-rating-buttons button:hover {
+    transform: translateY(-2px);
+}

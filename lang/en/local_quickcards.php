@@ -89,7 +89,8 @@ $string['inxdays'] = 'In {$a} days';
 $string['studydeck'] = 'Study Deck';
 $string['duereviews'] = 'Due for review today';
 $string['noduecards'] = 'Great job! You have no cards due for review right now.';
-$string['showanswer'] = 'Show answer';
+$string['showanswer'] = 'Show Answer';
+$string['showanswerspace'] = 'Show Answer (Space)';
 $string['flipcard'] = 'Flip card';
 $string['rating_again'] = 'Again (1)';
 $string['rating_hard'] = 'Hard (2)';
@@ -97,7 +98,12 @@ $string['rating_good'] = 'Good (3)';
 $string['rating_easy'] = 'Easy (4)';
 $string['sessioncomplete'] = 'Session completed!';
 $string['sessioncompletedesc'] = 'You have reviewed all due cards for this session.';
-$string['backtodecks'] = 'Back to decks';
+$string['backtodecks'] = 'Back to Decks';
+$string['backtodeck'] = 'Back to Deck';
+$string['cardof'] = 'Card {$a->current} of {$a->total}';
+$string['congratulations'] = 'Congratulations!';
+$string['studyagain'] = 'Study Again';
+$string['keyboard_shortcuts'] = 'Shortcuts: [Space] Flip card &bull; [1] Again &bull; [2] Hard &bull; [3] Good &bull; [4] Easy';
 
 // Privacy.
 $string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';

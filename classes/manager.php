@@ -221,6 +221,62 @@ class manager {
     }
 
     /**
+     * Get cards due for review for study session.
+     *
+     * @param int $userid User ID.
+     * @param int $deckid Deck ID (0 for all decks).
+     * @return array
+     */
+    public static function get_due_cards_for_study(int $userid, int $deckid = 0): array {
+        global $DB;
+
+        $now = time();
+        $context = \context_system::instance();
+
+        $where = "c.userid = :userid AND (r.nextreview IS NULL OR r.nextreview <= :now)";
+        $params = [
+            'userid' => $userid,
+            'now' => $now,
+            'ruserid' => $userid,
+        ];
+
+        if ($deckid > 0) {
+            $where .= " AND c.deckid = :deckid";
+            $params['deckid'] = $deckid;
+        }
+
+        $sql = "SELECT c.*,
+                       d.name AS deckname,
+                       r.easefactor,
+                       r.intervaldays,
+                       r.repetitions,
+                       r.nextreview
+                  FROM {local_quickcards_cards} c
+                  JOIN {local_quickcards_decks} d ON d.id = c.deckid
+             LEFT JOIN {local_quickcards_reviews} r ON r.cardid = c.id AND r.userid = :ruserid
+                 WHERE $where
+              ORDER BY COALESCE(r.nextreview, 0) ASC, c.id ASC";
+
+        $records = $DB->get_records_sql($sql, $params);
+
+        $duecards = [];
+        foreach ($records as $card) {
+            $duecards[] = [
+                'id' => (int) $card->id,
+                'deckid' => (int) $card->deckid,
+                'deckname' => format_string($card->deckname, true, ['context' => $context]),
+                'question' => format_text($card->question, $card->questionformat ?? FORMAT_HTML, ['context' => $context]),
+                'answer' => format_text($card->answer, $card->answerformat ?? FORMAT_HTML, ['context' => $context]),
+                'easefactor' => (float) ($card->easefactor ?? sm2::DEFAULT_EASE_FACTOR),
+                'intervaldays' => (int) ($card->intervaldays ?? 0),
+                'repetitions' => (int) ($card->repetitions ?? 0),
+            ];
+        }
+
+        return $duecards;
+    }
+
+    /**
      * Helper to format a human-readable next review string.
      *
      * @param int $nextreview Timestamp.
