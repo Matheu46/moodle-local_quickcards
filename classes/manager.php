@@ -277,6 +277,36 @@ class manager {
     }
 
     /**
+     * Get other decks owned by user (excluding current deck).
+     *
+     * @param int $userid User ID.
+     * @param int $currentdeckid Current Deck ID to exclude.
+     * @return array
+     */
+    public static function get_user_other_decks(int $userid, int $currentdeckid): array {
+        global $DB;
+
+        $context = \context_system::instance();
+        $records = $DB->get_records_select(
+            'local_quickcards_decks',
+            'userid = :userid AND id != :deckid',
+            ['userid' => $userid, 'deckid' => $currentdeckid],
+            'name ASC',
+            'id, name'
+        );
+
+        $decks = [];
+        foreach ($records as $r) {
+            $decks[] = [
+                'id' => (int) $r->id,
+                'name' => format_string($r->name, true, ['context' => $context]),
+            ];
+        }
+
+        return $decks;
+    }
+
+    /**
      * Helper to format a human-readable next review string.
      *
      * @param int $nextreview Timestamp.

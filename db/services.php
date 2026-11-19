@@ -81,4 +81,12 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
+    'local_quickcards_move_card' => [
+        'classname' => 'local_quickcards\\external\\move_card',
+        'methodname' => 'execute',
+        'description' => 'Move a flashcard to another deck.',
+        'type' => 'write',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
 ];

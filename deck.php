@@ -56,11 +56,14 @@ $PAGE->navbar->add(
 $PAGE->navbar->add($deck['name']);
 
 $courses = \local_quickcards\manager::get_user_courses_options($USER->id);
+$otherdecks = \local_quickcards\manager::get_user_other_decks($USER->id, $deckid);
 
 $templatecontext = [
     'deck' => $deck,
     'courses' => $courses,
     'hascourses' => !empty($courses),
+    'otherdecks' => $otherdecks,
+    'hasotherdecks' => !empty($otherdecks),
 ];
 
 // Initialize frontend AMD module.

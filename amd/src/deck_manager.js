@@ -45,6 +45,7 @@ const getModalInstance = (element) => {
 export const init = () => {
     const deckModalEl = document.getElementById('quickcards-deck-modal');
     const cardModalEl = document.getElementById('quickcards-card-modal');
+    const moveCardModalEl = document.getElementById('quickcards-move-card-modal');
 
     // Deck form fields.
     const deckForm = document.getElementById('quickcards-deck-form');
@@ -61,6 +62,11 @@ export const init = () => {
     const cardQuestionInput = document.getElementById('quickcards-card-question');
     const cardAnswerInput = document.getElementById('quickcards-card-answer');
     const cardModalTitle = document.getElementById('quickcards-card-modal-title');
+
+    // Move Card form fields.
+    const moveCardForm = document.getElementById('quickcards-move-card-form');
+    const moveCardIdInput = document.getElementById('quickcards-move-card-id');
+    const moveTargetDeckSelect = document.getElementById('quickcards-move-target-deck');
 
     // Document-level click handler for actions.
     document.addEventListener('click', (e) => {
@@ -229,6 +235,19 @@ export const init = () => {
                 );
                 return true;
             }).catch(Notification.exception);
+            return;
+        }
+
+        const moveCardBtn = e.target.closest('[data-action="quickcards-move-card"]');
+        if (moveCardBtn) {
+            const id = moveCardBtn.dataset.id;
+            if (moveCardIdInput) {
+                moveCardIdInput.value = id;
+            }
+            const modal = getModalInstance(moveCardModalEl);
+            if (modal) {
+                modal.show();
+            }
         }
     });
 
@@ -296,6 +315,38 @@ export const init = () => {
                         modal.hide();
                     }
                     window.location.reload();
+                }
+                return true;
+            }).catch(Notification.exception);
+        });
+    }
+
+    // Submit Move Card Form.
+    if (moveCardForm) {
+        moveCardForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const cardid = parseInt(moveCardIdInput.value, 10);
+            const targetdeckid = moveTargetDeckSelect ? parseInt(moveTargetDeckSelect.value, 10) : 0;
+
+            if (!cardid || !targetdeckid) {
+                return;
+            }
+
+            fetchMany([{
+                methodname: 'local_quickcards_move_card',
+                args: {cardid, targetdeckid},
+            }])[0].then((res) => {
+                if (res.success) {
+                    const modal = getModalInstance(moveCardModalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    const cardEl = document.getElementById('card-item-' + cardid);
+                    if (cardEl) {
+                        cardEl.remove();
+                    } else {
+                        window.location.reload();
+                    }
                 }
                 return true;
             }).catch(Notification.exception);

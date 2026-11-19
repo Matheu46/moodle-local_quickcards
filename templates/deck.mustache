@@ -94,6 +94,9 @@
                                 </span>
                             </div>
                             <div class="btn-group btn-group-sm">
+                                <button type="button" class="btn btn-outline-secondary" data-action="quickcards-move-card" data-bs-toggle="modal" data-bs-target="#quickcards-move-card-modal" data-id="{{id}}" title="{{#str}} movecard, local_quickcards {{/str}}">
+                                    <i class="fa fa-folder-open-o text-secondary" aria-hidden="true"></i>
+                                </button>
                                 <button type="button" class="btn btn-outline-secondary" data-action="quickcards-edit-card" data-bs-toggle="modal" data-bs-target="#quickcards-card-modal" data-id="{{id}}" data-question="{{rawquestion}}" data-answer="{{rawanswer}}" title="{{#str}} editcard, local_quickcards {{/str}}">
                                     <i class="fa fa-pencil text-primary" aria-hidden="true"></i>
                                 </button>
@@ -223,6 +226,48 @@
                     <button type="submit" class="btn btn-primary" id="quickcards-deck-submit-btn">
                         <i class="fa fa-save me-1" aria-hidden="true"></i> {{#str}} save, local_quickcards {{/str}}
                     </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Move Card to Another Deck -->
+<div class="modal fade" id="quickcards-move-card-modal" tabindex="-1" aria-labelledby="quickcards-move-card-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form id="quickcards-move-card-form">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="quickcards-move-card-modal-title">
+                        <i class="fa fa-folder-open-o me-2 text-primary" aria-hidden="true"></i>{{#str}} moveto, local_quickcards {{/str}}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{#str}} close, local_quickcards {{/str}}"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="quickcards-move-card-id" value="0">
+                    {{#hasotherdecks}}
+                        <div class="mb-3">
+                            <label for="quickcards-move-target-deck" class="form-label fw-bold">{{#str}} selecttargetdeck, local_quickcards {{/str}} <span class="text-danger">*</span></label>
+                            <select class="form-select" id="quickcards-move-target-deck" required>
+                                {{#otherdecks}}
+                                    <option value="{{id}}">{{name}}</option>
+                                {{/otherdecks}}
+                            </select>
+                        </div>
+                    {{/hasotherdecks}}
+                    {{^hasotherdecks}}
+                        <div class="alert alert-warning mb-0" role="alert">
+                            <i class="fa fa-info-circle me-1" aria-hidden="true"></i> {{#str}} notargetdecks, local_quickcards {{/str}}
+                        </div>
+                    {{/hasotherdecks}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{#str}} cancel, local_quickcards {{/str}}</button>
+                    {{#hasotherdecks}}
+                        <button type="submit" class="btn btn-primary" id="quickcards-move-card-submit-btn">
+                            <i class="fa fa-arrow-right me-1" aria-hidden="true"></i> {{#str}} movecard, local_quickcards {{/str}}
+                        </button>
+                    {{/hasotherdecks}}
                 </div>
             </form>
         </div>
