@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="local/quickcards/db" VERSION="2026111900" COMMENT="XMLDB file for local_quickcards"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+    <TABLES>
+        <TABLE NAME="local_quickcards_decks" COMMENT="Flashcard decks created by users">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true"/>
+                <FIELD NAME="description" TYPE="text" NOTNULL="false"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="userid_ix" UNIQUE="false" FIELDS="userid"/>
+                <INDEX NAME="courseid_ix" UNIQUE="false" FIELDS="courseid"/>
+            </INDEXES>
+        </TABLE>
+        <TABLE NAME="local_quickcards_cards" COMMENT="Flashcards within decks">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="deckid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="question" TYPE="text" NOTNULL="true"/>
+                <FIELD NAME="questionformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1"/>
+                <FIELD NAME="answer" TYPE="text" NOTNULL="true"/>
+                <FIELD NAME="answerformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="deckid_fk" TYPE="foreign" FIELDS="deckid" REFTABLE="local_quickcards_decks" REFFIELDS="id"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="userid_ix" UNIQUE="false" FIELDS="userid"/>
+            </INDEXES>
+        </TABLE>
+        <TABLE NAME="local_quickcards_reviews" COMMENT="Spaced repetition review progress per card and user">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="cardid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="easefactor" TYPE="number" LENGTH="5" DECIMALS="2" NOTNULL="true" DEFAULT="2.50"/>
+                <FIELD NAME="intervaldays" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="repetitions" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="nextreview" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0"/>
+                <FIELD NAME="lastreview" TYPE="int" LENGTH="10" NOTNULL="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="cardid_fk" TYPE="foreign" FIELDS="cardid" REFTABLE="local_quickcards_cards" REFFIELDS="id"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="card_user_uix" UNIQUE="true" FIELDS="cardid, userid"/>
+                <INDEX NAME="user_nextreview_ix" UNIQUE="false" FIELDS="userid, nextreview"/>
+            </INDEXES>
+        </TABLE>
+    </TABLES>
+</XMLDB>

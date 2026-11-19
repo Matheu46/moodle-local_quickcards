@@ -1,0 +1,103 @@
+<?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+
+/**
+ * Language strings for local_quickcards.
+ *
+ * @package     local_quickcards
+ * @copyright   2026 Matheus Mathias
+ * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['pluginname'] = 'QuickCards';
+$string['quickcards:use'] = 'Use QuickCards spaced repetition';
+
+// Navigation & General.
+$string['mycards'] = 'My QuickCards';
+$string['decks'] = 'Decks';
+$string['study'] = 'Study';
+$string['reviews'] = 'Reviews';
+$string['totaldecks'] = 'Total Decks';
+$string['totalcards'] = 'Total Cards';
+$string['dueforreview'] = 'Due Reviews';
+$string['studyall'] = 'Study All Due';
+$string['managecards'] = 'Manage Cards';
+$string['actions'] = 'Actions';
+$string['course'] = 'Course';
+$string['save'] = 'Save';
+$string['cancel'] = 'Cancel';
+$string['close'] = 'Close';
+$string['delete'] = 'Delete';
+$string['edit'] = 'Edit';
+
+// Decks.
+$string['deck'] = 'Deck';
+$string['createdeck'] = 'Create Deck';
+$string['editdeck'] = 'Edit Deck';
+$string['deletedeck'] = 'Delete Deck';
+$string['deckname'] = 'Deck Name';
+$string['deckname_help'] = 'Give your deck a clear name, such as "Anatomy - Muscles" or "JavaScript Basics".';
+$string['deckdescription'] = 'Description';
+$string['nodecks'] = 'You have not created any decks yet.';
+$string['nodecksdesc'] = 'Flashcard decks help you organize concepts and study with active recall. Create your first deck to get started!';
+$string['coursedeck'] = 'Linked Course';
+$string['generaldeck'] = 'General (Not tied to a course)';
+$string['confirmdeletedeck'] = 'Are you sure you want to delete this deck? All its cards and review history will be permanently deleted.';
+$string['deckcreated'] = 'Deck created successfully.';
+$string['deckupdated'] = 'Deck updated successfully.';
+$string['deckdeleted'] = 'Deck deleted successfully.';
+
+// Cards.
+$string['card'] = 'Card';
+$string['cards'] = 'Cards';
+$string['addcard'] = 'Add Card';
+$string['createcard'] = 'Add Card';
+$string['editcard'] = 'Edit Card';
+$string['deletecard'] = 'Delete Card';
+$string['question'] = 'Front (Prompt / Question)';
+$string['question_help'] = 'The question, term, or prompt that triggers active recall.';
+$string['answer'] = 'Back (Answer / Explanation)';
+$string['answer_help'] = 'The concise explanation or solution that you want to remember.';
+$string['nocards'] = 'There are no cards in this deck yet.';
+$string['nocardsdesc'] = 'Add cards with key concepts, definitions, or questions to start studying!';
+$string['cardcount'] = '{$a} cards';
+$string['confirmdeletecard'] = 'Are you sure you want to delete this card?';
+$string['cardcreated'] = 'Card created successfully.';
+$string['cardupdated'] = 'Card updated successfully.';
+$string['carddeleted'] = 'Card deleted successfully.';
+$string['nextreview'] = 'Next Review';
+$string['never'] = 'Never reviewed';
+$string['today'] = 'Due today';
+$string['inxdays'] = 'In {$a} days';
+
+// Study & Review.
+$string['studydeck'] = 'Study Deck';
+$string['duereviews'] = 'Due for review today';
+$string['noduecards'] = 'Great job! You have no cards due for review right now.';
+$string['showanswer'] = 'Show answer';
+$string['flipcard'] = 'Flip card';
+$string['rating_again'] = 'Again (1)';
+$string['rating_hard'] = 'Hard (2)';
+$string['rating_good'] = 'Good (3)';
+$string['rating_easy'] = 'Easy (4)';
+$string['sessioncomplete'] = 'Session completed!';
+$string['sessioncompletedesc'] = 'You have reviewed all due cards for this session.';
+$string['backtodecks'] = 'Back to decks';
+
+// Privacy.
+$string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';

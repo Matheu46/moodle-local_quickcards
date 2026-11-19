@@ -1,0 +1,24 @@
+/* QuickCards Styles */
+.quickcards-dashboard .border-dashed,
+.quickcards-deck-view .border-dashed {
+    border: 2px dashed #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.quickcards-dashboard .card-title a:hover {
+    color: var(--primary);
+}
+
+.quickcards-dashboard .dropdown .btn-icon {
+    border: none;
+    background: transparent;
+    padding: 0.25rem 0.5rem;
+}
+
+.quickcards-dashboard .dropdown .btn-icon:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.quickcards-deck-view .border-start-4 {
+    border-left-width: 4px;
+}
