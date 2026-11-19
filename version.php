@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_quickcards';
-$plugin->release = 'v0.4.0';
-$plugin->version = 2026111903;
+$plugin->release = 'v0.5.0';
+$plugin->version = 2026111904;
 $plugin->requires = 2024042200; // Moodle 4.4+.
 $plugin->maturity = MATURITY_ALPHA;

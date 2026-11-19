@@ -119,6 +119,40 @@ export const init = () => {
             return;
         }
 
+        const resetDeckBtn = e.target.closest('[data-action="quickcards-reset-deck"]');
+        if (resetDeckBtn) {
+            e.preventDefault();
+            const id = parseInt(resetDeckBtn.dataset.id, 10);
+            const name = resetDeckBtn.dataset.name || '';
+
+            getStrings([
+                {key: 'resetdeck', component: 'local_quickcards'},
+                {key: 'confirmresetdeck', component: 'local_quickcards', param: name},
+                {key: 'resetprogress', component: 'local_quickcards'},
+                {key: 'cancel', component: 'local_quickcards'},
+            ]).then(([title, question, confirmLabel, cancelLabel]) => {
+                Notification.confirm(
+                    title,
+                    question,
+                    confirmLabel,
+                    cancelLabel,
+                    () => {
+                        fetchMany([{
+                            methodname: 'local_quickcards_reset_deck',
+                            args: {id: id},
+                        }])[0].then((res) => {
+                            if (res.success) {
+                                window.location.reload();
+                            }
+                            return true;
+                        }).catch(Notification.exception);
+                    }
+                );
+                return true;
+            }).catch(Notification.exception);
+            return;
+        }
+
         const deleteDeckBtn = e.target.closest('[data-action="quickcards-delete-deck"]');
         if (deleteDeckBtn) {
             e.preventDefault();

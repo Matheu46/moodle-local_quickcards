@@ -89,4 +89,12 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
+    'local_quickcards_reset_deck' => [
+        'classname' => 'local_quickcards\\external\\reset_deck',
+        'methodname' => 'execute',
+        'description' => 'Reset study progress for all cards in a deck.',
+        'type' => 'write',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
 ];

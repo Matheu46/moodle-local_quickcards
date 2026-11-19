@@ -23,7 +23,6 @@
     <!-- Top Action Bar & Summary Stats -->
     <div class="row align-items-center mb-4 g-3">
         <div class="col-md-6">
-            <h2 class="h3 mb-1">{{#str}} mycards, local_quickcards {{/str}}</h2>
             <p class="text-muted mb-0">{{#str}} nodecksdesc, local_quickcards {{/str}}</p>
         </div>
         <div class="col-md-6 text-md-end">
@@ -100,6 +99,11 @@
                                         <li>
                                             <a class="dropdown-item" href="#" data-action="quickcards-edit-deck" data-bs-toggle="modal" data-bs-target="#quickcards-deck-modal" data-id="{{id}}" data-name="{{rawname}}" data-description="{{rawdescription}}" data-courseid="{{courseid}}">
                                                 <i class="fa fa-pencil me-2 text-primary" aria-hidden="true"></i> {{#str}} editdeck, local_quickcards {{/str}}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" data-action="quickcards-reset-deck" data-id="{{id}}" data-name="{{rawname}}">
+                                                <i class="fa fa-refresh me-2 text-warning" aria-hidden="true"></i> {{#str}} resetprogress, local_quickcards {{/str}}
                                             </a>
                                         </li>
                                         <li><hr class="dropdown-divider"></li>
