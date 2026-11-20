@@ -82,6 +82,8 @@ class import_csv extends external_api {
             throw new \moodle_exception('noguest');
         }
 
+        \local_quickcards\manager::require_enabled();
+
         $delimitermap = [
             'auto' => 'auto',
             'tab' => "\t",

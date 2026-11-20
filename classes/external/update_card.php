@@ -78,6 +78,8 @@ class update_card extends external_api {
             throw new \moodle_exception('noguest');
         }
 
+        \local_quickcards\manager::require_enabled();
+
         $card = $DB->get_record('local_quickcards_cards', ['id' => $params['id'], 'userid' => $USER->id], '*', MUST_EXIST);
 
         $card->question = $trimmedq;

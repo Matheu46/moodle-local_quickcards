@@ -79,6 +79,8 @@ class create_card extends external_api {
             throw new \moodle_exception('noguest');
         }
 
+        \local_quickcards\manager::require_enabled();
+
         // Verify deck belongs to current user.
         $deck = $DB->get_record('local_quickcards_decks', ['id' => $params['deckid'], 'userid' => $USER->id], '*', MUST_EXIST);
 

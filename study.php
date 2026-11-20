@@ -30,6 +30,8 @@ if (isguestuser()) {
     throw new \moodle_exception('noguest');
 }
 
+\local_quickcards\manager::require_enabled();
+
 $deckid = optional_param('deckid', 0, PARAM_INT);
 
 $context = \context_system::instance();

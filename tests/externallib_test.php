@@ -439,4 +439,24 @@ final class externallib_test extends advanced_testcase {
         $this->expectException(moodle_exception::class);
         create_deck::execute('Guest Deck', '', 0);
     }
+
+    /**
+     * Test execution is forbidden when the plugin is disabled.
+     */
+    public function test_disabled_plugin_access(): void {
+        $this->resetAfterTest();
+        $user = $this->getDataGenerator()->create_user();
+        $this->setUser($user);
+
+        // When enabled (default), creation succeeds.
+        $deck = create_deck::execute('Active Deck', '', 0);
+        $this->assertNotEmpty($deck['id']);
+
+        // Disable plugin.
+        set_config('enabled', 0, 'local_quickcards');
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage(get_string('plugindisabled', 'local_quickcards'));
+        create_deck::execute('Disabled Deck', '', 0);
+    }
 }

@@ -27,6 +27,29 @@ use stdClass;
  */
 class manager {
     /**
+     * Check whether QuickCards is enabled in site settings.
+     *
+     * @return bool True if enabled.
+     */
+    public static function is_enabled(): bool {
+        $enabled = get_config('local_quickcards', 'enabled');
+        if ($enabled === false) {
+            return true;
+        }
+        return !empty($enabled);
+    }
+
+    /**
+     * Require that QuickCards is enabled globally, throwing an exception otherwise.
+     *
+     * @throws \moodle_exception
+     */
+    public static function require_enabled(): void {
+        if (!self::is_enabled()) {
+            throw new \moodle_exception('plugindisabled', 'local_quickcards');
+        }
+    }
+    /**
      * Get all decks created by a user, enriched with card counts and due reviews.
      *
      * @param int $userid User ID.

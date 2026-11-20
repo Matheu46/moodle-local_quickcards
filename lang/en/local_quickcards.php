@@ -170,5 +170,10 @@ $string['nodeckname'] = 'The export file does not contain a valid deck name.';
 $string['nofileorcard'] = 'The export file does not contain any cards.';
 $string['unsupportedversion'] = 'Unsupported export file version: {$a}.';
 
+// Admin settings.
+$string['setting_enabled'] = 'Enable QuickCards';
+$string['setting_enabled_desc'] = 'If enabled, users with permission can access their flashcards and spaced repetition study sessions. If disabled, the entire plugin is deactivated.';
+$string['plugindisabled'] = 'QuickCards is currently disabled on this site.';
+
 // Privacy.
 $string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';

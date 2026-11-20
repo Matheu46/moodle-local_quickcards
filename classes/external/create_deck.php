@@ -74,6 +74,8 @@ class create_deck extends external_api {
             throw new \moodle_exception('noguest');
         }
 
+        \local_quickcards\manager::require_enabled();
+
         $now = time();
         $record = (object) [
             'userid' => (int) $USER->id,

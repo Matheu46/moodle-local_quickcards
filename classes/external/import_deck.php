@@ -69,6 +69,8 @@ class import_deck extends external_api {
             throw new \moodle_exception('noguest');
         }
 
+        \local_quickcards\manager::require_enabled();
+
         $res = importer::import_deck_from_json(
             $params['jsoncontent'],
             (int) $USER->id,

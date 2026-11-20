@@ -39,6 +39,10 @@ class hooks {
             return;
         }
 
+        if (!\local_quickcards\manager::is_enabled()) {
+            return;
+        }
+
         if (!has_capability('local/quickcards:use', \context_system::instance())) {
             return;
         }

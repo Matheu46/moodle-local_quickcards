@@ -66,6 +66,8 @@ class move_card extends external_api {
             throw new \moodle_exception('noguest');
         }
 
+        \local_quickcards\manager::require_enabled();
+
         // Verify card exists and belongs to current user.
         $card = $DB->get_record(
             'local_quickcards_cards',

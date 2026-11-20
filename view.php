@@ -30,6 +30,8 @@ if (isguestuser()) {
     throw new \moodle_exception('noguest');
 }
 
+\local_quickcards\manager::require_enabled();
+
 $context = \context_system::instance();
 require_capability('local/quickcards:use', $context);
 
