@@ -367,6 +367,22 @@ export const init = () => {
     const cardModalEl = document.getElementById('quickcards-card-modal');
     const moveCardModalEl = document.getElementById('quickcards-move-card-modal');
     const exportModalEl = document.getElementById('quickcards-export-modal');
+    const importModalEl = document.getElementById('quickcards-import-modal');
+
+    // Import Deck form fields.
+    const importForm = document.getElementById('quickcards-import-form');
+    const importFileInput = document.getElementById('quickcards-import-file-input');
+    const importErrorEl = document.getElementById('quickcards-import-error');
+    const importErrorMsg = document.getElementById('quickcards-import-error-msg');
+    const importPreviewEl = document.getElementById('quickcards-import-preview');
+    const importPreviewName = document.getElementById('quickcards-import-preview-name');
+    const importPreviewCount = document.getElementById('quickcards-import-preview-count');
+    const importCourseSelect = document.getElementById('quickcards-import-course-select');
+    const importProgressWrapper = document.getElementById('quickcards-import-progress-wrapper');
+    const importRestoreProgressCheck = document.getElementById('quickcards-import-restore-progress');
+    const importSubmitBtn = document.getElementById('quickcards-import-submit-btn');
+
+    let loadedJsonContent = '';
 
     // Export Deck form fields.
     const exportForm = document.getElementById('quickcards-export-form');
@@ -413,6 +429,28 @@ export const init = () => {
                     }
                     return true;
                 }).catch(Notification.exception);
+            }
+            return;
+        }
+
+        const importDeckBtn = e.target.closest('[data-action="quickcards-import-deck"]');
+        if (importDeckBtn) {
+            if (importForm) {
+                importForm.reset();
+                loadedJsonContent = '';
+                if (importPreviewEl) {
+                    importPreviewEl.classList.add('d-none');
+                }
+                if (importErrorEl) {
+                    importErrorEl.classList.add('d-none');
+                }
+                if (importSubmitBtn) {
+                    importSubmitBtn.disabled = true;
+                }
+                const modal = getModalInstance(importModalEl);
+                if (modal) {
+                    modal.show();
+                }
             }
             return;
         }
@@ -750,6 +788,109 @@ export const init = () => {
             if (modal) {
                 modal.hide();
             }
+        });
+    }
+
+    // Handle Import Deck File Selection and Preview.
+    if (importFileInput) {
+        importFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            loadedJsonContent = '';
+            importPreviewEl.classList.add('d-none');
+            importErrorEl.classList.add('d-none');
+            importSubmitBtn.disabled = true;
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const text = event.target.result;
+                    const data = JSON.parse(text);
+
+                    if (!data || typeof data !== 'object' || data.format !== 'local_quickcards') {
+                        getString('invalidfileformat', 'local_quickcards').then((msg) => {
+                            importErrorMsg.textContent = msg;
+                            importErrorEl.classList.remove('d-none');
+                            return true;
+                        }).catch(Notification.exception);
+                        return;
+                    }
+
+                    if (!data.deck || !data.deck.name || !Array.isArray(data.cards)) {
+                        getString('nodeckname', 'local_quickcards').then((msg) => {
+                            importErrorMsg.textContent = msg;
+                            importErrorEl.classList.remove('d-none');
+                            return true;
+                        }).catch(Notification.exception);
+                        return;
+                    }
+
+                    loadedJsonContent = text;
+                    importPreviewName.textContent = data.deck.name;
+                    getString('cardsinfile', 'local_quickcards', data.cards.length).then((label) => {
+                        importPreviewCount.textContent = label;
+                        return true;
+                    }).catch(() => {
+                        importPreviewCount.textContent = data.cards.length + ' cards';
+                    });
+
+                    if (data.includesprogress) {
+                        importProgressWrapper.classList.remove('d-none');
+                        importRestoreProgressCheck.checked = false;
+                    } else {
+                        importProgressWrapper.classList.add('d-none');
+                        importRestoreProgressCheck.checked = false;
+                    }
+
+                    importPreviewEl.classList.remove('d-none');
+                    importSubmitBtn.disabled = false;
+                } catch (err) {
+                    getString('invalidjson', 'local_quickcards').then((msg) => {
+                        importErrorMsg.textContent = msg;
+                        importErrorEl.classList.remove('d-none');
+                        return true;
+                    }).catch(Notification.exception);
+                }
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    // Submit Import Deck Form via AJAX WebService.
+    if (importForm) {
+        importForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!loadedJsonContent) {
+                return;
+            }
+
+            importSubmitBtn.disabled = true;
+            const courseid = importCourseSelect ? parseInt(importCourseSelect.value, 10) : 0;
+            const restoreprogress = importRestoreProgressCheck ? importRestoreProgressCheck.checked : false;
+
+            fetchMany([{
+                methodname: 'local_quickcards_import_deck',
+                args: {
+                    jsoncontent: loadedJsonContent,
+                    courseid: courseid,
+                    restoreprogress: restoreprogress,
+                },
+            }])[0].then((res) => {
+                if (res.success && res.deckid) {
+                    const modal = getModalInstance(importModalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    window.location.href = M.cfg.wwwroot + '/local/quickcards/deck.php?id=' + res.deckid;
+                }
+                return true;
+            }).catch((err) => {
+                importSubmitBtn.disabled = false;
+                Notification.exception(err);
+            });
         });
     }
 };

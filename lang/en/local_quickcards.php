@@ -140,6 +140,21 @@ $string['exportcontentonlydesc'] = 'Exports deck details and all flashcards with
 $string['exportwithprogress'] = 'Cards + Study Progress (Personal backup)';
 $string['exportwithprogressdesc'] = 'Includes your SM-2 intervals, ease factors, and repetition counts. Ideal for backing up or migrating your personal study progress.';
 $string['exportjson'] = 'Download JSON';
+$string['importdeck'] = 'Import Deck';
+$string['importjson'] = 'Import JSON';
+$string['selectjsonfile'] = 'Select QuickCards JSON file';
+$string['selectjsonfile_help'] = 'Choose a .json file exported from QuickCards.';
+$string['deckpreview'] = 'Deck Preview';
+$string['cardsinfile'] = '{$a} cards found';
+$string['containsstudyprogress'] = 'This file includes personal study progress.';
+$string['restoreprogress'] = 'Restore study progress';
+$string['restoreprogress_help'] = 'If enabled, previous review intervals and ease factors will be preserved. Leave unchecked to start studying these cards as new.';
+$string['deckimported'] = 'Deck "{$a->name}" with {$a->count} cards imported successfully.';
+$string['invalidfileformat'] = 'The selected file is not a valid QuickCards export.';
+$string['invalidjson'] = 'Could not parse JSON from the selected file.';
+$string['nodeckname'] = 'The export file does not contain a valid deck name.';
+$string['nofileorcard'] = 'The export file does not contain any cards.';
+$string['unsupportedversion'] = 'Unsupported export file version: {$a}.';
 
 // Privacy.
 $string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';

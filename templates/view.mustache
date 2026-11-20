@@ -34,6 +34,9 @@
             <button type="button" class="btn btn-primary" data-action="quickcards-create-deck" data-bs-toggle="modal" data-bs-target="#quickcards-deck-modal">
                 <i class="fa fa-plus me-1" aria-hidden="true"></i> {{#str}} createdeck, local_quickcards {{/str}}
             </button>
+            <button type="button" class="btn btn-outline-primary ms-2" data-action="quickcards-import-deck" data-bs-toggle="modal" data-bs-target="#quickcards-import-modal">
+                <i class="fa fa-upload me-1" aria-hidden="true"></i> {{#str}} importdeck, local_quickcards {{/str}}
+            </button>
         </div>
     </div>
 
@@ -262,9 +265,14 @@
                 <p class="card-text text-muted mx-auto" style="max-width: 500px;">
                     {{#str}} nodecksdesc, local_quickcards {{/str}}
                 </p>
-                <button type="button" class="btn btn-primary mt-2" data-action="quickcards-create-deck" data-bs-toggle="modal" data-bs-target="#quickcards-deck-modal">
-                    <i class="fa fa-plus me-1" aria-hidden="true"></i> {{#str}} createdeck, local_quickcards {{/str}}
-                </button>
+                <div class="d-flex justify-content-center gap-2 mt-2">
+                    <button type="button" class="btn btn-primary" data-action="quickcards-create-deck" data-bs-toggle="modal" data-bs-target="#quickcards-deck-modal">
+                        <i class="fa fa-plus me-1" aria-hidden="true"></i> {{#str}} createdeck, local_quickcards {{/str}}
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" data-action="quickcards-import-deck" data-bs-toggle="modal" data-bs-target="#quickcards-import-modal">
+                        <i class="fa fa-upload me-1" aria-hidden="true"></i> {{#str}} importdeck, local_quickcards {{/str}}
+                    </button>
+                </div>
             </div>
         </div>
     {{/hasdecks}}
@@ -314,3 +322,4 @@
 </div>
 
 {{> local_quickcards/export_modal }}
+{{> local_quickcards/import_modal }}

@@ -97,4 +97,12 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
+    'local_quickcards_import_deck' => [
+        'classname' => 'local_quickcards\\external\\import_deck',
+        'methodname' => 'execute',
+        'description' => 'Import a flashcard deck from a JSON payload.',
+        'type' => 'write',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
 ];
