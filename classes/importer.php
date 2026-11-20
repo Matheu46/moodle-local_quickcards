@@ -173,4 +173,165 @@ class importer {
             'progressrestored' => $hasprogress,
         ];
     }
+
+    /**
+     * Detect the best delimiter from a CSV/TSV text snippet.
+     *
+     * @param string $content Normalized CSV/TSV text.
+     * @return string Single-character delimiter (\t, ;, or ,).
+     */
+    public static function detect_delimiter(string $content): string {
+        $lines = explode("\n", $content);
+        foreach ($lines as $line) {
+            $trimmed = trim($line);
+            if ($trimmed === '') {
+                continue;
+            }
+            if (strpos($trimmed, "\t") !== false) {
+                return "\t";
+            }
+            if (strpos($trimmed, ';') !== false) {
+                return ';';
+            }
+            return ',';
+        }
+        return ',';
+    }
+
+    /**
+     * Parse cards from CSV or tab-separated text (Anki / Quizlet / Excel).
+     *
+     * @param string $csvcontent Raw CSV/TSV text content.
+     * @param string $delimiter Delimiter character or 'auto' for auto-detection.
+     * @return array List of ['question' => string, 'answer' => string].
+     */
+    public static function parse_csv_cards(string $csvcontent, string $delimiter = 'auto'): array {
+        // Strip UTF-8 BOM if present and normalize line endings.
+        $normalized = preg_replace('/^\xEF\xBB\xBF/', '', $csvcontent);
+        $normalized = str_replace(["\r\n", "\r"], "\n", (string) $normalized);
+
+        if ($delimiter === 'auto' || $delimiter === '') {
+            $delimiter = self::detect_delimiter($normalized);
+        }
+
+        $handle = fopen('php://temp', 'r+');
+        fwrite($handle, $normalized);
+        rewind($handle);
+
+        $cards = [];
+        $isfirstrow = true;
+        $headerquestions = ['question', 'front', 'term', 'pergunta', 'frente', 'termo'];
+        $headeranswers = ['answer', 'back', 'definition', 'resposta', 'verso', 'definicao', 'definição'];
+
+        while (($row = fgetcsv($handle, 0, $delimiter, '"', '\\')) !== false) {
+            if (count($row) < 2) {
+                continue;
+            }
+
+            $question = clean_param(trim((string) $row[0]), PARAM_RAW);
+            $answer = clean_param(trim((string) $row[1]), PARAM_RAW);
+
+            if ($question === '' || $answer === '') {
+                continue;
+            }
+
+            // Skip standard header row if detected on the first non-empty row.
+            if ($isfirstrow) {
+                $isfirstrow = false;
+                $qlower = \core_text::strtolower($question);
+                $alower = \core_text::strtolower($answer);
+                if (in_array($qlower, $headerquestions, true) && in_array($alower, $headeranswers, true)) {
+                    continue;
+                }
+            }
+
+            $cards[] = [
+                'question' => $question,
+                'answer' => $answer,
+            ];
+        }
+
+        fclose($handle);
+        return $cards;
+    }
+
+    /**
+     * Import a new deck from CSV or tab-separated text (Anki / Quizlet / Excel).
+     *
+     * @param string $deckname Name for the new deck.
+     * @param string $csvcontent Raw CSV/TSV text content.
+     * @param int $userid Target user ID.
+     * @param int $courseid Optional associated course ID.
+     * @param string $delimiter Delimiter character or 'auto'.
+     * @param string $description Optional deck description.
+     * @return array Import summary containing deckid, deckname, and cardscount.
+     * @throws moodle_exception If deck name is empty or no valid cards are found.
+     */
+    public static function import_deck_from_csv(
+        string $deckname,
+        string $csvcontent,
+        int $userid,
+        int $courseid = 0,
+        string $delimiter = 'auto',
+        string $description = ''
+    ): array {
+        global $DB;
+
+        $cleandeckname = clean_param(trim($deckname), PARAM_TEXT);
+        if ($cleandeckname === '') {
+            throw new moodle_exception('nodeckname', 'local_quickcards');
+        }
+
+        $cards = self::parse_csv_cards($csvcontent, $delimiter);
+        if (empty($cards)) {
+            throw new moodle_exception('nofileorcard', 'local_quickcards');
+        }
+
+        $now = time();
+        $transaction = $DB->start_delegated_transaction();
+
+        $newdeck = (object) [
+            'userid' => $userid,
+            'courseid' => $courseid,
+            'name' => $cleandeckname,
+            'description' => clean_param($description, PARAM_RAW),
+            'descriptionformat' => FORMAT_HTML,
+            'timecreated' => $now,
+            'timemodified' => $now,
+        ];
+        $deckid = $DB->insert_record('local_quickcards_decks', $newdeck);
+
+        foreach ($cards as $carditem) {
+            $cardrecord = (object) [
+                'deckid' => $deckid,
+                'userid' => $userid,
+                'question' => $carditem['question'],
+                'questionformat' => FORMAT_HTML,
+                'answer' => $carditem['answer'],
+                'answerformat' => FORMAT_HTML,
+                'timecreated' => $now,
+                'timemodified' => $now,
+            ];
+            $cardid = $DB->insert_record('local_quickcards_cards', $cardrecord);
+
+            $reviewrecord = (object) [
+                'cardid' => $cardid,
+                'userid' => $userid,
+                'easefactor' => sm2::DEFAULT_EASE_FACTOR,
+                'intervaldays' => 0,
+                'repetitions' => 0,
+                'nextreview' => $now,
+                'lastreview' => null,
+            ];
+            $DB->insert_record('local_quickcards_reviews', $reviewrecord);
+        }
+
+        $transaction->allow_commit();
+
+        return [
+            'deckid' => (int) $deckid,
+            'deckname' => $cleandeckname,
+            'cardscount' => count($cards),
+        ];
+    }
 }

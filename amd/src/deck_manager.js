@@ -389,7 +389,20 @@ export const init = () => {
     const exportDeckIdInput = document.getElementById('quickcards-export-deck-id');
     const exportDeckNameEl = document.getElementById('quickcards-export-deck-name');
     const exportSesskeyInput = document.getElementById('quickcards-export-sesskey');
+    const exportFormatInput = document.getElementById('quickcards-export-format');
+    const exportIncludeProgressInput = document.getElementById('quickcards-export-includeprogress');
     const exportContentOnlyRadio = document.getElementById('quickcards-export-content-only');
+    const exportModeRadios = document.querySelectorAll('input[name="exportmode"]');
+
+    // Import CSV form fields.
+    const importCsvForm = document.getElementById('quickcards-import-csv-form');
+    const importCsvNameInput = document.getElementById('quickcards-import-csv-name');
+    const importCsvDelimiterSelect = document.getElementById('quickcards-import-csv-delimiter');
+    const importCsvCourseSelect = document.getElementById('quickcards-import-csv-course');
+    const importCsvFileInput = document.getElementById('quickcards-import-csv-file');
+    const importCsvTextArea = document.getElementById('quickcards-import-csv-text');
+    const importCsvCountBadge = document.getElementById('quickcards-import-csv-count');
+    const importCsvSubmitBtn = document.getElementById('quickcards-import-csv-submit-btn');
 
     // Deck form fields.
     const deckForm = document.getElementById('quickcards-deck-form');
@@ -447,10 +460,19 @@ export const init = () => {
                 if (importSubmitBtn) {
                     importSubmitBtn.disabled = true;
                 }
-                const modal = getModalInstance(importModalEl);
-                if (modal) {
-                    modal.show();
+            }
+            if (importCsvForm) {
+                importCsvForm.reset();
+                if (importCsvCountBadge) {
+                    importCsvCountBadge.classList.add('d-none');
                 }
+                if (importCsvSubmitBtn) {
+                    importCsvSubmitBtn.disabled = true;
+                }
+            }
+            const modal = getModalInstance(importModalEl);
+            if (modal) {
+                modal.show();
             }
             return;
         }
@@ -502,6 +524,12 @@ export const init = () => {
             }
             if (exportContentOnlyRadio) {
                 exportContentOnlyRadio.checked = true;
+            }
+            if (exportFormatInput) {
+                exportFormatInput.value = 'json';
+            }
+            if (exportIncludeProgressInput) {
+                exportIncludeProgressInput.value = '0';
             }
 
             const modal = getModalInstance(exportModalEl);
@@ -781,6 +809,20 @@ export const init = () => {
         });
     }
 
+    // Sync Export mode radio selection with hidden format & includeprogress inputs.
+    exportModeRadios.forEach((radio) => {
+        radio.addEventListener('change', () => {
+            if (radio.checked) {
+                if (exportFormatInput) {
+                    exportFormatInput.value = radio.dataset.format || 'json';
+                }
+                if (exportIncludeProgressInput) {
+                    exportIncludeProgressInput.value = radio.dataset.includeprogress || '0';
+                }
+            }
+        });
+    });
+
     // Submit Export Deck Form (native GET download, just close the modal).
     if (exportForm) {
         exportForm.addEventListener('submit', () => {
@@ -889,6 +931,145 @@ export const init = () => {
                 return true;
             }).catch((err) => {
                 importSubmitBtn.disabled = false;
+                Notification.exception(err);
+            });
+        });
+    }
+
+    // Helper to count valid CSV/TSV card lines for live preview.
+    const updateCsvPreview = () => {
+        if (!importCsvTextArea || !importCsvSubmitBtn) {
+            return;
+        }
+        const raw = importCsvTextArea.value.trim();
+        const deckName = importCsvNameInput ? importCsvNameInput.value.trim() : '';
+
+        if (!raw) {
+            if (importCsvCountBadge) {
+                importCsvCountBadge.classList.add('d-none');
+            }
+            importCsvSubmitBtn.disabled = true;
+            return;
+        }
+
+        const lines = raw.split(/\r?\n/).map((l) => l.trim()).filter((l) => l !== '');
+        const mode = importCsvDelimiterSelect ? importCsvDelimiterSelect.value : 'auto';
+        let sep = ',';
+        if (mode === 'tab') {
+            sep = '\t';
+        } else if (mode === 'semicolon') {
+            sep = ';';
+        } else if (mode === 'comma') {
+            sep = ',';
+        } else if (lines.length > 0) {
+            if (lines[0].includes('\t')) {
+                sep = '\t';
+            } else if (lines[0].includes(';')) {
+                sep = ';';
+            }
+        }
+
+        const headerQuestions = ['question', 'front', 'term', 'pergunta', 'frente', 'termo'];
+        const headerAnswers = ['answer', 'back', 'definition', 'resposta', 'verso', 'definicao', 'definição'];
+        let count = 0;
+
+        lines.forEach((line, idx) => {
+            const parts = line.split(sep);
+            if (parts.length < 2) {
+                return;
+            }
+            const q = parts[0].replace(/^"|"$/g, '').trim();
+            const a = parts[1].replace(/^"|"$/g, '').trim();
+            if (!q || !a) {
+                return;
+            }
+            if (idx === 0 && headerQuestions.includes(q.toLowerCase()) && headerAnswers.includes(a.toLowerCase())) {
+                return;
+            }
+            count++;
+        });
+
+        if (importCsvCountBadge) {
+            if (count > 0) {
+                getString('csvcardsdetected', 'local_quickcards', count).then((label) => {
+                    importCsvCountBadge.textContent = label;
+                    importCsvCountBadge.classList.remove('d-none');
+                    return true;
+                }).catch(() => {
+                    importCsvCountBadge.textContent = `${count} cards`;
+                    importCsvCountBadge.classList.remove('d-none');
+                });
+            } else {
+                importCsvCountBadge.classList.add('d-none');
+            }
+        }
+
+        importCsvSubmitBtn.disabled = (count === 0 || deckName === '');
+    };
+
+    if (importCsvFileInput) {
+        importCsvFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (importCsvTextArea) {
+                    importCsvTextArea.value = event.target.result;
+                }
+                if (importCsvNameInput && importCsvNameInput.value.trim() === '') {
+                    importCsvNameInput.value = file.name.replace(/\.[^.]+$/, '');
+                }
+                updateCsvPreview();
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    if (importCsvTextArea) {
+        importCsvTextArea.addEventListener('input', updateCsvPreview);
+    }
+    if (importCsvNameInput) {
+        importCsvNameInput.addEventListener('input', updateCsvPreview);
+    }
+    if (importCsvDelimiterSelect) {
+        importCsvDelimiterSelect.addEventListener('change', updateCsvPreview);
+    }
+
+    if (importCsvForm) {
+        importCsvForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const deckname = importCsvNameInput ? importCsvNameInput.value.trim() : '';
+            const csvcontent = importCsvTextArea ? importCsvTextArea.value.trim() : '';
+            const courseid = importCsvCourseSelect ? parseInt(importCsvCourseSelect.value, 10) : 0;
+            const delimiter = importCsvDelimiterSelect ? importCsvDelimiterSelect.value : 'auto';
+
+            if (!deckname || !csvcontent) {
+                return;
+            }
+
+            importCsvSubmitBtn.disabled = true;
+
+            fetchMany([{
+                methodname: 'local_quickcards_import_csv',
+                args: {
+                    deckname: deckname,
+                    csvcontent: csvcontent,
+                    courseid: courseid,
+                    delimiter: delimiter,
+                },
+            }])[0].then((res) => {
+                if (res.success && res.deckid) {
+                    const modal = getModalInstance(importModalEl);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    window.location.href = M.cfg.wwwroot + '/local/quickcards/deck.php?id=' + res.deckid;
+                }
+                return true;
+            }).catch((err) => {
+                importCsvSubmitBtn.disabled = false;
                 Notification.exception(err);
             });
         });

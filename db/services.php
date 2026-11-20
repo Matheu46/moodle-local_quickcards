@@ -105,4 +105,12 @@ $functions = [
         'ajax' => true,
         'loginrequired' => true,
     ],
+    'local_quickcards_import_csv' => [
+        'classname' => 'local_quickcards\\external\\import_csv',
+        'methodname' => 'execute',
+        'description' => 'Import a flashcard deck from CSV or tab-separated text (Anki/Quizlet).',
+        'type' => 'write',
+        'ajax' => true,
+        'loginrequired' => true,
+    ],
 ];

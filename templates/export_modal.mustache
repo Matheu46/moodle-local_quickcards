@@ -17,7 +17,7 @@
 {{!
     @template local_quickcards/export_modal
 
-    Modal dialog for exporting a QuickCards deck as JSON.
+    Modal dialog for exporting a QuickCards deck as JSON or CSV.
 }}
 <div class="modal fade" id="quickcards-export-modal" tabindex="-1" aria-labelledby="quickcards-export-modal-title" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -32,6 +32,8 @@
                 <div class="modal-body">
                     <input type="hidden" name="id" id="quickcards-export-deck-id" value="0">
                     <input type="hidden" name="sesskey" id="quickcards-export-sesskey" value="{{sesskey}}">
+                    <input type="hidden" name="format" id="quickcards-export-format" value="json">
+                    <input type="hidden" name="includeprogress" id="quickcards-export-includeprogress" value="0">
 
                     <p class="mb-3">
                         <span class="text-muted">{{#str}} exportdeckfor, local_quickcards {{/str}}</span>
@@ -39,18 +41,26 @@
                     </p>
 
                     <div class="form-check p-3 border rounded mb-2 bg-light">
-                        <input class="form-check-input ms-0 me-2" type="radio" name="includeprogress" id="quickcards-export-content-only" value="0" checked>
+                        <input class="form-check-input ms-0 me-2" type="radio" name="exportmode" id="quickcards-export-content-only" value="json_content" data-format="json" data-includeprogress="0" checked>
                         <label class="form-check-label d-block ps-4" for="quickcards-export-content-only">
                             <span class="fw-bold d-block">{{#str}} exportcontentonly, local_quickcards {{/str}}</span>
                             <span class="small text-muted">{{#str}} exportcontentonlydesc, local_quickcards {{/str}}</span>
                         </label>
                     </div>
 
-                    <div class="form-check p-3 border rounded bg-light">
-                        <input class="form-check-input ms-0 me-2" type="radio" name="includeprogress" id="quickcards-export-with-progress" value="1">
+                    <div class="form-check p-3 border rounded mb-2 bg-light">
+                        <input class="form-check-input ms-0 me-2" type="radio" name="exportmode" id="quickcards-export-with-progress" value="json_backup" data-format="json" data-includeprogress="1">
                         <label class="form-check-label d-block ps-4" for="quickcards-export-with-progress">
                             <span class="fw-bold d-block">{{#str}} exportwithprogress, local_quickcards {{/str}}</span>
                             <span class="small text-muted">{{#str}} exportwithprogressdesc, local_quickcards {{/str}}</span>
+                        </label>
+                    </div>
+
+                    <div class="form-check p-3 border rounded bg-light">
+                        <input class="form-check-input ms-0 me-2" type="radio" name="exportmode" id="quickcards-export-csv" value="csv" data-format="csv" data-includeprogress="0">
+                        <label class="form-check-label d-block ps-4" for="quickcards-export-csv">
+                            <span class="fw-bold d-block">{{#str}} exportcsv, local_quickcards {{/str}}</span>
+                            <span class="small text-muted">{{#str}} exportcsvdesc, local_quickcards {{/str}}</span>
                         </label>
                     </div>
                 </div>

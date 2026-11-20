@@ -35,20 +35,29 @@ require_capability('local/quickcards:use', $context);
 require_sesskey();
 
 $deckid = required_param('id', PARAM_INT);
+$format = optional_param('format', 'json', PARAM_ALPHA);
 $includeprogress = (bool) optional_param('includeprogress', 0, PARAM_BOOL);
 
-$payload = \local_quickcards\exporter::export_deck($deckid, $USER->id, $includeprogress);
-$filename = \local_quickcards\exporter::generate_filename($payload['deck']['name'], $includeprogress);
-$json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+if ($format === 'csv') {
+    $payload = \local_quickcards\exporter::export_deck($deckid, $USER->id, false);
+    $filename = \local_quickcards\exporter::generate_filename($payload['deck']['name'], false, 'csv');
+    $content = \local_quickcards\exporter::export_deck_csv($deckid, $USER->id);
+    $contenttype = 'text/csv; charset=utf-8';
+} else {
+    $payload = \local_quickcards\exporter::export_deck($deckid, $USER->id, $includeprogress);
+    $filename = \local_quickcards\exporter::generate_filename($payload['deck']['name'], $includeprogress, 'json');
+    $content = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $contenttype = 'application/json; charset=utf-8';
+}
 
 \core\session\manager::write_close();
 
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: ' . $contenttype);
 header('Content-Disposition: attachment; filename="' . $filename . '"');
-header('Content-Length: ' . strlen($json));
+header('Content-Length: ' . strlen($content));
 header('Cache-Control: private, must-revalidate, pre-check=0, post-check=0, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-echo $json;
+echo $content;
 exit;

@@ -124,13 +124,45 @@ class exporter {
     }
 
     /**
+     * Export a deck as a UTF-8 CSV string (compatible with Excel, Anki, and Quizlet).
+     *
+     * @param int $deckid Deck ID to export.
+     * @param int $userid Owner user ID.
+     * @param string $delimiter Column delimiter (default comma).
+     * @return string CSV content with UTF-8 BOM.
+     */
+    public static function export_deck_csv(int $deckid, int $userid, string $delimiter = ','): string {
+        $payload = self::export_deck($deckid, $userid, false);
+
+        $handle = fopen('php://temp', 'r+');
+        // Write UTF-8 BOM for proper accent handling in Microsoft Excel.
+        fwrite($handle, "\xEF\xBB\xBF");
+
+        fputcsv($handle, ['Question', 'Answer'], $delimiter, '"', '\\');
+        foreach ($payload['cards'] as $card) {
+            fputcsv($handle, [$card['question'], $card['answer']], $delimiter, '"', '\\');
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return (string) $csv;
+    }
+
+    /**
      * Generate a safe download filename for an exported deck.
      *
      * @param string $deckname Raw deck name.
      * @param bool $includeprogress Whether progress is included.
-     * @return string Sanitized filename ending in .json.
+     * @param string $extension File extension without dot (json or csv).
+     * @return string Sanitized filename.
      */
-    public static function generate_filename(string $deckname, bool $includeprogress = false): string {
+    public static function generate_filename(
+        string $deckname,
+        bool $includeprogress = false,
+        string $extension = 'json'
+    ): string {
         $clean = clean_filename($deckname);
         $clean = preg_replace('/[^a-zA-Z0-9_-]+/', '-', $clean);
         $clean = trim(strtolower((string) $clean), '-');
@@ -139,9 +171,10 @@ class exporter {
             $clean = 'deck';
         }
 
-        $suffix = $includeprogress ? '-backup' : '';
+        $ext = ($extension === 'csv') ? 'csv' : 'json';
+        $suffix = ($includeprogress && $ext === 'json') ? '-backup' : '';
         $date = date('Ymd');
 
-        return 'quickcards-' . $clean . $suffix . '-' . $date . '.json';
+        return 'quickcards-' . $clean . $suffix . '-' . $date . '.' . $ext;
     }
 }
