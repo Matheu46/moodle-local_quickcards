@@ -64,6 +64,7 @@ $templatecontext = [
     'hascourses' => !empty($courses),
     'otherdecks' => $otherdecks,
     'hasotherdecks' => !empty($otherdecks),
+    'sesskey' => sesskey(),
 ];
 
 // Initialize frontend AMD module.

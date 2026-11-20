@@ -366,6 +366,14 @@ export const init = () => {
     const deckModalEl = document.getElementById('quickcards-deck-modal');
     const cardModalEl = document.getElementById('quickcards-card-modal');
     const moveCardModalEl = document.getElementById('quickcards-move-card-modal');
+    const exportModalEl = document.getElementById('quickcards-export-modal');
+
+    // Export Deck form fields.
+    const exportForm = document.getElementById('quickcards-export-form');
+    const exportDeckIdInput = document.getElementById('quickcards-export-deck-id');
+    const exportDeckNameEl = document.getElementById('quickcards-export-deck-name');
+    const exportSesskeyInput = document.getElementById('quickcards-export-sesskey');
+    const exportContentOnlyRadio = document.getElementById('quickcards-export-content-only');
 
     // Deck form fields.
     const deckForm = document.getElementById('quickcards-deck-form');
@@ -435,6 +443,32 @@ export const init = () => {
                     }
                     return true;
                 }).catch(Notification.exception);
+            }
+            return;
+        }
+
+        const exportDeckBtn = e.target.closest('[data-action="quickcards-export-deck"]');
+        if (exportDeckBtn) {
+            e.preventDefault();
+            const id = exportDeckBtn.dataset.id || '0';
+            const name = exportDeckBtn.dataset.name || '';
+
+            if (exportDeckIdInput) {
+                exportDeckIdInput.value = id;
+            }
+            if (exportDeckNameEl) {
+                exportDeckNameEl.textContent = name;
+            }
+            if (exportSesskeyInput && M.cfg && M.cfg.sesskey) {
+                exportSesskeyInput.value = M.cfg.sesskey;
+            }
+            if (exportContentOnlyRadio) {
+                exportContentOnlyRadio.checked = true;
+            }
+
+            const modal = getModalInstance(exportModalEl);
+            if (modal) {
+                modal.show();
             }
             return;
         }
@@ -706,6 +740,16 @@ export const init = () => {
                 }
                 return true;
             }).catch(Notification.exception);
+        });
+    }
+
+    // Submit Export Deck Form (native GET download, just close the modal).
+    if (exportForm) {
+        exportForm.addEventListener('submit', () => {
+            const modal = getModalInstance(exportModalEl);
+            if (modal) {
+                modal.hide();
+            }
         });
     }
 };

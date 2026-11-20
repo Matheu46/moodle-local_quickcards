@@ -168,6 +168,11 @@
                                             </a>
                                         </li>
                                         <li>
+                                            <a class="dropdown-item" href="#" data-action="quickcards-export-deck" data-bs-toggle="modal" data-bs-target="#quickcards-export-modal" data-id="{{id}}" data-name="{{rawname}}">
+                                                <i class="fa fa-download me-2 text-info" aria-hidden="true"></i> {{#str}} exportdeck, local_quickcards {{/str}}
+                                            </a>
+                                        </li>
+                                        <li>
                                             <a class="dropdown-item" href="#" data-action="quickcards-reset-deck" data-id="{{id}}" data-name="{{rawname}}">
                                                 <i class="fa fa-refresh me-2 text-warning" aria-hidden="true"></i> {{#str}} resetprogress, local_quickcards {{/str}}
                                             </a>
@@ -307,3 +312,5 @@
         </div>
     </div>
 </div>
+
+{{> local_quickcards/export_modal }}

@@ -55,6 +55,9 @@
                     <button type="button" class="btn btn-outline-secondary" data-action="quickcards-edit-deck" data-bs-toggle="modal" data-bs-target="#quickcards-deck-modal" data-id="{{deck.id}}" data-name="{{deck.rawname}}" data-description="{{deck.rawdescription}}" data-courseid="{{deck.courseid}}" title="{{#str}} editdeck, local_quickcards {{/str}}">
                         <i class="fa fa-pencil" aria-hidden="true"></i>
                     </button>
+                    <button type="button" class="btn btn-outline-secondary" data-action="quickcards-export-deck" data-bs-toggle="modal" data-bs-target="#quickcards-export-modal" data-id="{{deck.id}}" data-name="{{deck.rawname}}" title="{{#str}} exportdeck, local_quickcards {{/str}}">
+                        <i class="fa fa-download text-info" aria-hidden="true"></i>
+                    </button>
                     {{#deck.hascards}}
                         <button type="button" class="btn btn-outline-secondary" data-action="quickcards-reset-deck" data-id="{{deck.id}}" data-name="{{deck.rawname}}" title="{{#str}} resetprogress, local_quickcards {{/str}}">
                             <i class="fa fa-refresh text-warning" aria-hidden="true"></i>
@@ -365,3 +368,5 @@
         </div>
     </div>
 </div>
+
+{{> local_quickcards/export_modal }}

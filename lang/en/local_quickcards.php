@@ -132,5 +132,14 @@ $string['clearfilter'] = 'Clear filters';
 $string['showingcount'] = 'Showing {$a->shown} of {$a->total} cards';
 $string['showingdeckscount'] = 'Showing {$a->shown} of {$a->total} decks';
 
+// Export & Import.
+$string['exportdeck'] = 'Export Deck';
+$string['exportdeckfor'] = 'Exporting deck:';
+$string['exportcontentonly'] = 'Cards only (Recommended for sharing)';
+$string['exportcontentonlydesc'] = 'Exports deck details and all flashcards without your personal review history. Ideal for sharing with classmates.';
+$string['exportwithprogress'] = 'Cards + Study Progress (Personal backup)';
+$string['exportwithprogressdesc'] = 'Includes your SM-2 intervals, ease factors, and repetition counts. Ideal for backing up or migrating your personal study progress.';
+$string['exportjson'] = 'Download JSON';
+
 // Privacy.
 $string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';

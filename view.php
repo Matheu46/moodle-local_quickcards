@@ -56,6 +56,7 @@ $templatecontext = [
     'studyallurl' => $studyallurl->out(false),
     'courses' => $courses,
     'hascourses' => !empty($courses),
+    'sesskey' => sesskey(),
 ];
 
 // Initialize frontend AMD module.
