@@ -81,14 +81,14 @@ class manager {
     public static function user_in_allowed_cohorts(?int $userid = null): bool {
         global $DB, $USER;
 
-        $cohortids = self::get_allowed_cohort_ids();
-        if (empty($cohortids)) {
-            return true;
-        }
-
         $userid = $userid ?? (int) $USER->id;
         if ($userid <= 0 || isguestuser($userid)) {
             return false;
+        }
+
+        $cohortids = self::get_allowed_cohort_ids();
+        if (empty($cohortids)) {
+            return true;
         }
 
         if (is_siteadmin($userid)) {
@@ -133,7 +133,14 @@ class manager {
      * @throws \moodle_exception
      */
     public static function require_access(?int $userid = null): void {
+        global $USER;
+
         self::require_enabled();
+
+        $userid = $userid ?? (int) $USER->id;
+        if ($userid <= 0 || isguestuser($userid)) {
+            throw new \moodle_exception('noguest');
+        }
 
         if (!self::user_in_allowed_cohorts($userid)) {
             throw new \moodle_exception('accessrestricted', 'local_quickcards');

@@ -437,6 +437,7 @@ final class externallib_test extends advanced_testcase {
         $this->setGuestUser();
 
         $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage(get_string('noguest', 'error'));
         create_deck::execute('Guest Deck', '', 0);
     }
 

@@ -65,12 +65,12 @@ class submit_review extends external_api {
 
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('local/quickcards:use', $context);
 
         if (isguestuser()) {
             throw new \moodle_exception('noguest');
         }
 
+        require_capability('local/quickcards:use', $context);
         \local_quickcards\manager::require_access();
 
         // Verify card exists and belongs to current user.

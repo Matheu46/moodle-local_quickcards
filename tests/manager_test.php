@@ -103,4 +103,24 @@ final class manager_test extends advanced_testcase {
         $this->expectExceptionMessage(get_string('accessrestricted', 'local_quickcards'));
         manager::require_access((int) $user2->id);
     }
+
+    /**
+     * Test guest users are strictly prevented from accessing QuickCards.
+     */
+    public function test_guest_user_cannot_access(): void {
+        $this->resetAfterTest();
+        $this->setGuestUser();
+
+        // The can_access method must return false for guest users.
+        $this->assertFalse(manager::can_access());
+
+        // The user_in_allowed_cohorts method must return false for guest users even with no cohort restriction.
+        unset_config('allowedcohorts', 'local_quickcards');
+        $this->assertFalse(manager::user_in_allowed_cohorts());
+
+        // The require_access method must throw noguest exception for guest users.
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage(get_string('noguest', 'error'));
+        manager::require_access();
+    }
 }
