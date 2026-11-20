@@ -78,21 +78,92 @@
     </div>
 
     {{#deck.hascards}}
+        <!-- Search and Filter Bar -->
+        <div class="card border-0 shadow-sm bg-light mb-4">
+            <div class="card-body p-3">
+                <div class="row g-2 align-items-center">
+                    <!-- Text Search Input -->
+                    <div class="col-12 col-md-6 col-lg-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </span>
+                            <input type="search"
+                                   id="quickcards-search-cards"
+                                   class="form-control border-start-0"
+                                   placeholder="{{#str}} searchcards, local_quickcards {{/str}}"
+                                   aria-label="{{#str}} searchcards, local_quickcards {{/str}}">
+                            <button class="btn btn-outline-secondary d-none"
+                                    type="button"
+                                    id="quickcards-clear-card-search"
+                                    title="{{#str}} clearfilter, local_quickcards {{/str}}">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Status Filter Pills -->
+                    <div class="col-12 col-md-6 col-lg-7 d-flex flex-wrap gap-1 justify-content-md-end align-items-center">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="{{#str}} filterstatus, local_quickcards {{/str}}">
+                            <button type="button" class="btn btn-outline-primary active" data-filter="all">
+                                {{#str}} filterall, local_quickcards {{/str}}
+                                <span class="badge bg-secondary ms-1" id="filter-count-all">{{deck.totalcards}}</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" data-filter="due">
+                                <i class="fa fa-clock-o me-1" aria-hidden="true"></i>{{#str}} filterdue, local_quickcards {{/str}}
+                                <span class="badge bg-warning text-dark ms-1" id="filter-count-due">{{deck.duecount}}</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-info" data-filter="new">
+                                <i class="fa fa-star-o me-1" aria-hidden="true"></i>{{#str}} filternew, local_quickcards {{/str}}
+                                <span class="badge bg-info text-dark ms-1" id="filter-count-new">{{deck.newcount}}</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-success" data-filter="learned">
+                                <i class="fa fa-check me-1" aria-hidden="true"></i>{{#str}} filterlearned, local_quickcards {{/str}}
+                                <span class="badge bg-success ms-1" id="filter-count-learned">{{deck.learnedcount}}</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Filter & Results Count bar -->
+                <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top small text-muted">
+                    <span id="quickcards-cards-count-info">
+                        {{deck.totalcards}} {{#str}} cards, local_quickcards {{/str}}
+                    </span>
+                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none d-none" id="quickcards-reset-filters-btn">
+                        <i class="fa fa-undo me-1" aria-hidden="true"></i>{{#str}} clearfilter, local_quickcards {{/str}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="row row-cols-1 row-cols-md-2 g-3" id="quickcards-cards-container">
             {{#deck.cards}}
-                <div class="col" id="card-item-{{id}}">
+                <div class="col quickcards-card-item"
+                     id="card-item-{{id}}"
+                     data-card-id="{{id}}"
+                     data-is-due="{{#isdue}}1{{/isdue}}{{^isdue}}0{{/isdue}}"
+                     data-is-new="{{#isnew}}1{{/isnew}}{{^isnew}}0{{/isnew}}"
+                     data-is-learned="{{#islearned}}1{{/islearned}}{{^islearned}}0{{/islearned}}">
                     <div class="card h-100 shadow-sm border {{#isdue}}border-warning{{/isdue}}">
                         <div class="card-header bg-white d-flex justify-content-between align-items-center py-2">
                             <div>
+                                {{#isnew}}
+                                    <span class="badge text-bg-info text-dark">
+                                        <i class="fa fa-star-o me-1" aria-hidden="true"></i>{{#str}} filternew, local_quickcards {{/str}}
+                                    </span>
+                                {{/isnew}}
                                 {{#isdue}}
                                     <span class="badge text-bg-warning">
                                         <i class="fa fa-clock-o me-1" aria-hidden="true"></i> {{#str}} today, local_quickcards {{/str}}
                                     </span>
                                 {{/isdue}}
                                 {{^isdue}}
-                                    <span class="badge text-bg-light border text-muted">
-                                        <i class="fa fa-calendar me-1" aria-hidden="true"></i> {{nextreviewhuman}}
-                                    </span>
+                                    {{^isnew}}
+                                        <span class="badge text-bg-light border text-muted">
+                                            <i class="fa fa-calendar me-1" aria-hidden="true"></i> {{nextreviewhuman}}
+                                        </span>
+                                    {{/isnew}}
                                 {{/isdue}}
                                 <span class="badge text-bg-light border text-muted ms-1" title="Repetitions">
                                     {{repetitions}}x
@@ -133,6 +204,22 @@
                     </div>
                 </div>
             {{/deck.cards}}
+        </div>
+
+        <!-- Empty Search State -->
+        <div id="quickcards-no-search-results" class="card text-center py-5 border-dashed shadow-sm d-none mt-3">
+            <div class="card-body">
+                <div class="mb-3 text-muted">
+                    <i class="fa fa-search fa-3x" aria-hidden="true"></i>
+                </div>
+                <h5 class="card-title">{{#str}} nocardsfound, local_quickcards {{/str}}</h5>
+                <p class="card-text text-muted small">
+                    {{#str}} trydifferentsearch, local_quickcards {{/str}}
+                </p>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="quickcards-empty-clear-btn">
+                    <i class="fa fa-times me-1" aria-hidden="true"></i>{{#str}} clearfilter, local_quickcards {{/str}}
+                </button>
+            </div>
         </div>
     {{/deck.hascards}}
 

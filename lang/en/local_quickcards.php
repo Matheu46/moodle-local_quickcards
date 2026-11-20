@@ -114,5 +114,23 @@ $string['congratulations'] = 'Congratulations!';
 $string['studyagain'] = 'Study Again';
 $string['keyboard_shortcuts'] = 'Shortcuts: [Space] Flip card &bull; [1] Again &bull; [2] Hard &bull; [3] Good &bull; [4] Easy';
 
+// Search & Filters.
+$string['searchcards'] = 'Search cards...';
+$string['searchdecks'] = 'Search decks...';
+$string['filterstatus'] = 'Filter by status';
+$string['filtercourse'] = 'Filter by course';
+$string['filterall'] = 'All';
+$string['filterdue'] = 'Due';
+$string['filternew'] = 'New';
+$string['filterlearned'] = 'Learned';
+$string['allcourses'] = 'All courses';
+$string['withduecards'] = 'With due reviews';
+$string['nocardsfound'] = 'No cards match your search or filter.';
+$string['nodecksfound'] = 'No decks match your search or filter.';
+$string['trydifferentsearch'] = 'Try searching with different keywords or reset your filters.';
+$string['clearfilter'] = 'Clear filters';
+$string['showingcount'] = 'Showing {$a->shown} of {$a->total} cards';
+$string['showingdeckscount'] = 'Showing {$a->shown} of {$a->total} decks';
+
 // Privacy.
 $string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';

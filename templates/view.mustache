@@ -82,9 +82,75 @@
 
     <!-- Decks List Section -->
     {{#hasdecks}}
+        <!-- Search and Filter Bar for Decks -->
+        <div class="card border-0 shadow-sm bg-light mb-4">
+            <div class="card-body p-3">
+                <div class="row g-2 align-items-center">
+                    <!-- Text Search Input -->
+                    <div class="col-12 col-md-6 col-lg-5">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="fa fa-search" aria-hidden="true"></i>
+                            </span>
+                            <input type="search"
+                                   id="quickcards-search-decks"
+                                   class="form-control border-start-0"
+                                   placeholder="{{#str}} searchdecks, local_quickcards {{/str}}"
+                                   aria-label="{{#str}} searchdecks, local_quickcards {{/str}}">
+                            <button class="btn btn-outline-secondary d-none"
+                                    type="button"
+                                    id="quickcards-clear-deck-search"
+                                    title="{{#str}} clearfilter, local_quickcards {{/str}}">
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Course Filter Dropdown & Due Only button -->
+                    <div class="col-12 col-md-6 col-lg-7 d-flex flex-wrap gap-2 justify-content-md-end align-items-center">
+                        {{#hascourses}}
+                            <div class="d-flex align-items-center">
+                                <select id="quickcards-filter-deck-course" class="form-select form-select-sm" aria-label="{{#str}} filtercourse, local_quickcards {{/str}}">
+                                    <option value="all">{{#str}} allcourses, local_quickcards {{/str}}</option>
+                                    <option value="general">{{#str}} generaldeck, local_quickcards {{/str}}</option>
+                                    {{#courses}}
+                                        <option value="{{id}}">{{fullname}}</option>
+                                    {{/courses}}
+                                </select>
+                            </div>
+                        {{/hascourses}}
+
+                        <div class="btn-group btn-group-sm" role="group" aria-label="{{#str}} filterstatus, local_quickcards {{/str}}">
+                            <button type="button" class="btn btn-outline-primary active" data-deck-filter="all">
+                                {{#str}} filterall, local_quickcards {{/str}}
+                                <span class="badge bg-secondary ms-1" id="deck-filter-count-all">{{totaldecks}}</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-warning" data-deck-filter="due">
+                                <i class="fa fa-clock-o me-1" aria-hidden="true"></i>{{#str}} withduecards, local_quickcards {{/str}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Filter & Results Count bar -->
+                <div class="d-flex justify-content-between align-items-center mt-2 pt-2 border-top small text-muted">
+                    <span id="quickcards-decks-count-info">
+                        {{totaldecks}} {{#str}} decks, local_quickcards {{/str}}
+                    </span>
+                    <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none d-none" id="quickcards-reset-deck-filters-btn">
+                        <i class="fa fa-undo me-1" aria-hidden="true"></i>{{#str}} clearfilter, local_quickcards {{/str}}
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="quickcards-decks-container">
             {{#decks}}
-                <div class="col" id="deck-card-{{id}}">
+                <div class="col quickcards-deck-item"
+                     id="deck-card-{{id}}"
+                     data-deck-id="{{id}}"
+                     data-course-id="{{courseid}}"
+                     data-has-due="{{#hasdue}}1{{/hasdue}}{{^hasdue}}0{{/hasdue}}">
                     <div class="card h-100 shadow-sm border">
                         <div class="card-body d-flex flex-column">
                             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -162,6 +228,22 @@
                     </div>
                 </div>
             {{/decks}}
+        </div>
+
+        <!-- Empty Decks Search State -->
+        <div id="quickcards-no-deck-results" class="card text-center py-5 border-dashed shadow-sm d-none mt-3">
+            <div class="card-body">
+                <div class="mb-3 text-muted">
+                    <i class="fa fa-search fa-3x" aria-hidden="true"></i>
+                </div>
+                <h5 class="card-title">{{#str}} nodecksfound, local_quickcards {{/str}}</h5>
+                <p class="card-text text-muted small">
+                    {{#str}} trydifferentsearch, local_quickcards {{/str}}
+                </p>
+                <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="quickcards-empty-deck-clear-btn">
+                    <i class="fa fa-times me-1" aria-hidden="true"></i>{{#str}} clearfilter, local_quickcards {{/str}}
+                </button>
+            </div>
         </div>
     {{/hasdecks}}
 

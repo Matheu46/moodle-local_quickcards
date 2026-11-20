@@ -146,10 +146,20 @@ class manager {
         $context = \context_system::instance();
         $cards = [];
         $duecount = 0;
+        $newcount = 0;
+        $learnedcount = 0;
         foreach ($records as $card) {
             $isdue = (!empty($card->nextreview) && (int) $card->nextreview <= $now);
+            $isnew = (empty($card->lastreview) || (int) ($card->repetitions ?? 0) === 0);
+            $islearned = (!$isnew && !$isdue);
             if ($isdue) {
                 $duecount++;
+            }
+            if ($isnew) {
+                $newcount++;
+            }
+            if ($islearned) {
+                $learnedcount++;
             }
 
             $cards[] = [
@@ -160,6 +170,8 @@ class manager {
                 'answer' => format_text($card->answer, $card->answerformat ?? FORMAT_HTML, ['context' => $context]),
                 'rawanswer' => $card->answer,
                 'isdue' => $isdue,
+                'isnew' => $isnew,
+                'islearned' => $islearned,
                 'intervaldays' => (int) ($card->intervaldays ?? 0),
                 'repetitions' => (int) ($card->repetitions ?? 0),
                 'nextreviewhuman' => self::format_next_review((int) ($card->nextreview ?? 0), (int) ($card->lastreview ?? 0)),
@@ -187,7 +199,11 @@ class manager {
             'hascourse' => !empty($coursename),
             'totalcards' => count($cards),
             'duecount' => $duecount,
+            'newcount' => $newcount,
+            'learnedcount' => $learnedcount,
             'hasdue' => $duecount > 0,
+            'hasnew' => $newcount > 0,
+            'haslearned' => $learnedcount > 0,
             'hascards' => count($cards) > 0,
             'studyurl' => $studyurl->out(false),
             'cards' => $cards,

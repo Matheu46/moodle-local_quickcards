@@ -40,9 +40,329 @@ const getModalInstance = (element) => {
 };
 
 /**
+ * Setup search and filter functionality for cards in a deck.
+ *
+ * @return {object} Controller with refresh function.
+ */
+const setupCardFilters = () => {
+    const searchInput = document.getElementById('quickcards-search-cards');
+    const clearBtn = document.getElementById('quickcards-clear-card-search');
+    const filterBtns = document.querySelectorAll('[data-filter]');
+    const countInfo = document.getElementById('quickcards-cards-count-info');
+    const resetFiltersBtn = document.getElementById('quickcards-reset-filters-btn');
+    const noResultsEl = document.getElementById('quickcards-no-search-results');
+    const emptyClearBtn = document.getElementById('quickcards-empty-clear-btn');
+    const cardsContainer = document.getElementById('quickcards-cards-container');
+
+    if (!cardsContainer) {
+        return {
+            refresh: () => {},
+        };
+    }
+
+    let currentQuery = '';
+    let currentStatus = 'all';
+
+    const getCardItems = () => cardsContainer.querySelectorAll('.quickcards-card-item');
+
+    const applyCardFilters = () => {
+        const cards = getCardItems();
+        const total = cards.length;
+        let shown = 0;
+        let totalDue = 0;
+        let totalNew = 0;
+        let totalLearned = 0;
+
+        cards.forEach((card) => {
+            const isDue = (card.dataset.isDue === '1');
+            const isNew = (card.dataset.isNew === '1');
+            const isLearned = (card.dataset.isLearned === '1');
+
+            if (isDue) {
+                totalDue++;
+            }
+            if (isNew) {
+                totalNew++;
+            }
+            if (isLearned) {
+                totalLearned++;
+            }
+
+            const matchesText = !currentQuery || card.textContent.toLowerCase().includes(currentQuery);
+
+            let matchesStatus = true;
+            if (currentStatus === 'due') {
+                matchesStatus = isDue;
+            } else if (currentStatus === 'new') {
+                matchesStatus = isNew;
+            } else if (currentStatus === 'learned') {
+                matchesStatus = isLearned;
+            }
+
+            const visible = (matchesText && matchesStatus);
+            if (visible) {
+                card.classList.remove('d-none');
+                shown++;
+            } else {
+                card.classList.add('d-none');
+            }
+        });
+
+        // Update badge counts.
+        const countAllEl = document.getElementById('filter-count-all');
+        const countDueEl = document.getElementById('filter-count-due');
+        const countNewEl = document.getElementById('filter-count-new');
+        const countLearnedEl = document.getElementById('filter-count-learned');
+        if (countAllEl) {
+            countAllEl.textContent = total.toString();
+        }
+        if (countDueEl) {
+            countDueEl.textContent = totalDue.toString();
+        }
+        if (countNewEl) {
+            countNewEl.textContent = totalNew.toString();
+        }
+        if (countLearnedEl) {
+            countLearnedEl.textContent = totalLearned.toString();
+        }
+
+        // Update count label.
+        if (countInfo) {
+            getString('showingcount', 'local_quickcards', {shown: shown, total: total}).then((text) => {
+                countInfo.textContent = text;
+                return true;
+            }).catch(() => {
+                countInfo.textContent = `${shown} / ${total}`;
+            });
+        }
+
+        // Toggle clear buttons and empty state.
+        const isFiltered = (currentQuery !== '' || currentStatus !== 'all');
+        if (clearBtn) {
+            clearBtn.classList.toggle('d-none', currentQuery === '');
+        }
+        if (resetFiltersBtn) {
+            resetFiltersBtn.classList.toggle('d-none', !isFiltered);
+        }
+        if (noResultsEl) {
+            noResultsEl.classList.toggle('d-none', shown > 0 || total === 0);
+        }
+    };
+
+    const resetFilters = () => {
+        currentQuery = '';
+        currentStatus = 'all';
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        filterBtns.forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.filter === 'all');
+        });
+        applyCardFilters();
+    };
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentQuery = e.target.value.trim().toLowerCase();
+            applyCardFilters();
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                resetFilters();
+            }
+        });
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            currentQuery = '';
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.focus();
+            }
+            applyCardFilters();
+        });
+    }
+
+    filterBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentStatus = btn.dataset.filter;
+            applyCardFilters();
+        });
+    });
+
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', resetFilters);
+    }
+    if (emptyClearBtn) {
+        emptyClearBtn.addEventListener('click', () => {
+            resetFilters();
+            if (searchInput) {
+                searchInput.focus();
+            }
+        });
+    }
+
+    return {
+        refresh: applyCardFilters,
+    };
+};
+
+/**
+ * Setup search and filter functionality for decks on dashboard.
+ */
+const setupDeckFilters = () => {
+    const searchInput = document.getElementById('quickcards-search-decks');
+    const clearBtn = document.getElementById('quickcards-clear-deck-search');
+    const courseSelect = document.getElementById('quickcards-filter-deck-course');
+    const filterBtns = document.querySelectorAll('[data-deck-filter]');
+    const countInfo = document.getElementById('quickcards-decks-count-info');
+    const resetFiltersBtn = document.getElementById('quickcards-reset-deck-filters-btn');
+    const noResultsEl = document.getElementById('quickcards-no-deck-results');
+    const emptyClearBtn = document.getElementById('quickcards-empty-deck-clear-btn');
+    const decksContainer = document.getElementById('quickcards-decks-container');
+
+    if (!decksContainer) {
+        return;
+    }
+
+    let currentQuery = '';
+    let currentCourse = 'all';
+    let currentStatus = 'all';
+
+    const getDeckItems = () => decksContainer.querySelectorAll('.quickcards-deck-item');
+
+    const applyDeckFilters = () => {
+        const decks = getDeckItems();
+        const total = decks.length;
+        let shown = 0;
+
+        decks.forEach((deck) => {
+            const matchesText = !currentQuery || deck.textContent.toLowerCase().includes(currentQuery);
+
+            let matchesCourse = true;
+            if (currentCourse === 'general') {
+                matchesCourse = (deck.dataset.courseId === '0');
+            } else if (currentCourse !== 'all') {
+                matchesCourse = (deck.dataset.courseId === currentCourse);
+            }
+
+            let matchesStatus = true;
+            if (currentStatus === 'due') {
+                matchesStatus = (deck.dataset.hasDue === '1');
+            }
+
+            const visible = (matchesText && matchesCourse && matchesStatus);
+            if (visible) {
+                deck.classList.remove('d-none');
+                shown++;
+            } else {
+                deck.classList.add('d-none');
+            }
+        });
+
+        // Update count label.
+        if (countInfo) {
+            getString('showingdeckscount', 'local_quickcards', {shown: shown, total: total}).then((text) => {
+                countInfo.textContent = text;
+                return true;
+            }).catch(() => {
+                countInfo.textContent = `${shown} / ${total}`;
+            });
+        }
+
+        // Toggle clear buttons and empty state.
+        const isFiltered = (currentQuery !== '' || currentCourse !== 'all' || currentStatus !== 'all');
+        if (clearBtn) {
+            clearBtn.classList.toggle('d-none', currentQuery === '');
+        }
+        if (resetFiltersBtn) {
+            resetFiltersBtn.classList.toggle('d-none', !isFiltered);
+        }
+        if (noResultsEl) {
+            noResultsEl.classList.toggle('d-none', shown > 0 || total === 0);
+        }
+    };
+
+    const resetFilters = () => {
+        currentQuery = '';
+        currentCourse = 'all';
+        currentStatus = 'all';
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        if (courseSelect) {
+            courseSelect.value = 'all';
+        }
+        filterBtns.forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.deckFilter === 'all');
+        });
+        applyDeckFilters();
+    };
+
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            currentQuery = e.target.value.trim().toLowerCase();
+            applyDeckFilters();
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                resetFilters();
+            }
+        });
+    }
+
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            currentQuery = '';
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.focus();
+            }
+            applyDeckFilters();
+        });
+    }
+
+    if (courseSelect) {
+        courseSelect.addEventListener('change', (e) => {
+            currentCourse = e.target.value;
+            applyDeckFilters();
+        });
+    }
+
+    filterBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentStatus = btn.dataset.deckFilter;
+            applyDeckFilters();
+        });
+    });
+
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', resetFilters);
+    }
+    if (emptyClearBtn) {
+        emptyClearBtn.addEventListener('click', () => {
+            resetFilters();
+            if (searchInput) {
+                searchInput.focus();
+            }
+        });
+    }
+};
+
+/**
  * Initialize Deck Manager event listeners.
  */
 export const init = () => {
+    const cardFilters = setupCardFilters();
+    setupDeckFilters();
+
     const deckModalEl = document.getElementById('quickcards-deck-modal');
     const cardModalEl = document.getElementById('quickcards-card-modal');
     const moveCardModalEl = document.getElementById('quickcards-move-card-modal');
@@ -259,6 +579,7 @@ export const init = () => {
                                 const cardEl = document.getElementById('card-item-' + id);
                                 if (cardEl) {
                                     cardEl.remove();
+                                    cardFilters.refresh();
                                 } else {
                                     window.location.reload();
                                 }
@@ -378,6 +699,7 @@ export const init = () => {
                     const cardEl = document.getElementById('card-item-' + cardid);
                     if (cardEl) {
                         cardEl.remove();
+                        cardFilters.refresh();
                     } else {
                         window.location.reload();
                     }
