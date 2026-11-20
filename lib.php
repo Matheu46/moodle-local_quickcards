@@ -44,11 +44,7 @@ function local_quickcards_extend_navigation_user(
         return;
     }
 
-    if (!\local_quickcards\manager::is_enabled()) {
-        return;
-    }
-
-    if (!has_capability('local/quickcards:use', \context_system::instance())) {
+    if (!\local_quickcards\manager::can_access((int) $user->id)) {
         return;
     }
 

@@ -71,7 +71,7 @@ class submit_review extends external_api {
             throw new \moodle_exception('noguest');
         }
 
-        \local_quickcards\manager::require_enabled();
+        \local_quickcards\manager::require_access();
 
         // Verify card exists and belongs to current user.
         $card = $DB->get_record(

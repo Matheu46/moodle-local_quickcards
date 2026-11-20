@@ -459,4 +459,32 @@ final class externallib_test extends advanced_testcase {
         $this->expectExceptionMessage(get_string('plugindisabled', 'local_quickcards'));
         create_deck::execute('Disabled Deck', '', 0);
     }
+
+    /**
+     * Test execution is forbidden for users outside configured allowed cohorts.
+     */
+    public function test_cohort_restricted_access(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $this->resetAfterTest();
+
+        $alloweduser = $this->getDataGenerator()->create_user();
+        $blockeduser = $this->getDataGenerator()->create_user();
+        $cohort = $this->getDataGenerator()->create_cohort(['name' => 'Allowed Cohort']);
+        cohort_add_member($cohort->id, $alloweduser->id);
+
+        set_config('allowedcohorts', (string) $cohort->id, 'local_quickcards');
+
+        // Allowed user can create a deck.
+        $this->setUser($alloweduser);
+        $deck = create_deck::execute('Cohort Deck', '', 0);
+        $this->assertNotEmpty($deck['id']);
+
+        // User outside the allowed cohort is blocked.
+        $this->setUser($blockeduser);
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage(get_string('accessrestricted', 'local_quickcards'));
+        create_deck::execute('Blocked Deck', '', 0);
+    }
 }

@@ -49,6 +49,96 @@ class manager {
             throw new \moodle_exception('plugindisabled', 'local_quickcards');
         }
     }
+
+    /**
+     * Return the list of configured allowed cohort IDs.
+     *
+     * An empty array means no cohort restriction is active (all permitted users may access).
+     *
+     * @return int[] Array of cohort IDs.
+     */
+    public static function get_allowed_cohort_ids(): array {
+        $raw = get_config('local_quickcards', 'allowedcohorts');
+        if ($raw === false || trim((string) $raw) === '') {
+            return [];
+        }
+
+        $ids = array_filter(array_map('intval', explode(',', (string) $raw)), static function (int $id): bool {
+            return $id > 0;
+        });
+
+        return array_values(array_unique($ids));
+    }
+
+    /**
+     * Check whether a user satisfies the cohort access restriction.
+     *
+     * Site administrators always bypass cohort restrictions so they can configure and test the plugin.
+     *
+     * @param int|null $userid User ID (defaults to current user).
+     * @return bool True if no cohort restriction is active, user is site admin, or user belongs to an allowed cohort.
+     */
+    public static function user_in_allowed_cohorts(?int $userid = null): bool {
+        global $DB, $USER;
+
+        $cohortids = self::get_allowed_cohort_ids();
+        if (empty($cohortids)) {
+            return true;
+        }
+
+        $userid = $userid ?? (int) $USER->id;
+        if ($userid <= 0 || isguestuser($userid)) {
+            return false;
+        }
+
+        if (is_siteadmin($userid)) {
+            return true;
+        }
+
+        [$insql, $params] = $DB->get_in_or_equal($cohortids, SQL_PARAMS_NAMED);
+        $params['userid'] = $userid;
+
+        return $DB->record_exists_select('cohort_members', "userid = :userid AND cohortid {$insql}", $params);
+    }
+
+    /**
+     * Check whether a user can access QuickCards (plugin enabled, capability granted, and cohort restriction satisfied).
+     *
+     * @param int|null $userid User ID (defaults to current user).
+     * @return bool True if the user can access QuickCards.
+     */
+    public static function can_access(?int $userid = null): bool {
+        global $USER;
+
+        if (!self::is_enabled()) {
+            return false;
+        }
+
+        $userid = $userid ?? (int) $USER->id;
+        if ($userid <= 0 || isguestuser($userid)) {
+            return false;
+        }
+
+        if (!has_capability('local/quickcards:use', \context_system::instance(), $userid)) {
+            return false;
+        }
+
+        return self::user_in_allowed_cohorts($userid);
+    }
+
+    /**
+     * Require that QuickCards is enabled and the user satisfies cohort restrictions.
+     *
+     * @param int|null $userid User ID (defaults to current user).
+     * @throws \moodle_exception
+     */
+    public static function require_access(?int $userid = null): void {
+        self::require_enabled();
+
+        if (!self::user_in_allowed_cohorts($userid)) {
+            throw new \moodle_exception('accessrestricted', 'local_quickcards');
+        }
+    }
     /**
      * Get all decks created by a user, enriched with card counts and due reviews.
      *

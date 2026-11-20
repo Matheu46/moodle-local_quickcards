@@ -30,7 +30,7 @@ if (isguestuser()) {
     throw new \moodle_exception('noguest');
 }
 
-\local_quickcards\manager::require_enabled();
+\local_quickcards\manager::require_access();
 
 $deckid = required_param('id', PARAM_INT);
 

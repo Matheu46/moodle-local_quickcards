@@ -54,4 +54,53 @@ final class manager_test extends advanced_testcase {
         $this->expectExceptionMessage(get_string('plugindisabled', 'local_quickcards'));
         manager::require_enabled();
     }
+
+    /**
+     * Test cohort-based access restrictions.
+     */
+    public function test_cohort_access_restrictions(): void {
+        global $CFG;
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $cohort1 = $this->getDataGenerator()->create_cohort(['name' => 'Cohort Alpha']);
+        $cohort2 = $this->getDataGenerator()->create_cohort(['name' => 'Cohort Beta']);
+
+        // Add user1 to cohort1; user2 belongs to no cohort.
+        cohort_add_member($cohort1->id, $user1->id);
+
+        // No cohorts configured: everyone with capability has access.
+        unset_config('allowedcohorts', 'local_quickcards');
+        $this->assertEquals([], manager::get_allowed_cohort_ids());
+        $this->assertTrue(manager::can_access((int) $user1->id));
+        $this->assertTrue(manager::can_access((int) $user2->id));
+
+        // Restrict to cohort1 and cohort2.
+        set_config('allowedcohorts', $cohort1->id . ',' . $cohort2->id, 'local_quickcards');
+        $this->assertEquals([(int) $cohort1->id, (int) $cohort2->id], manager::get_allowed_cohort_ids());
+
+        // Member of cohort1 has access; non-member does not.
+        $this->assertTrue(manager::can_access((int) $user1->id));
+        $this->assertFalse(manager::can_access((int) $user2->id));
+
+        // Site admin always bypasses cohort restrictions when plugin is enabled.
+        $admin = get_admin();
+        $this->assertTrue(manager::can_access((int) $admin->id));
+
+        // When plugin is globally disabled, even cohort members and admins cannot access.
+        set_config('enabled', 0, 'local_quickcards');
+        $this->assertFalse(manager::can_access((int) $user1->id));
+        $this->assertFalse(manager::can_access((int) $admin->id));
+
+        // Re-enable plugin and verify require_access throws accessrestricted for non-member.
+        set_config('enabled', 1, 'local_quickcards');
+        manager::require_access((int) $user1->id);
+
+        $this->expectException(moodle_exception::class);
+        $this->expectExceptionMessage(get_string('accessrestricted', 'local_quickcards'));
+        manager::require_access((int) $user2->id);
+    }
 }

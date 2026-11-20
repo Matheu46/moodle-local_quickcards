@@ -29,6 +29,8 @@ if ($hassiteconfig) {
     $ADMIN->add('localplugins', $settings);
 
     if ($ADMIN->fulltree) {
+        require_once($CFG->dirroot . '/cohort/lib.php');
+
         // Enable/disable QuickCards globally.
         $settings->add(new admin_setting_configcheckbox(
             'local_quickcards/enabled',
@@ -36,5 +38,28 @@ if ($hassiteconfig) {
             get_string('setting_enabled_desc', 'local_quickcards'),
             1
         ));
+
+        // Restrict access to specific cohorts (empty = all users with capability).
+        $allcohorts = cohort_get_all_cohorts(0, 0);
+        $cohortchoices = [];
+        foreach ($allcohorts['cohorts'] as $cohort) {
+            $cohortchoices[$cohort->id] = format_string($cohort->name);
+        }
+
+        if (!empty($cohortchoices)) {
+            $settings->add(new admin_setting_configmultiselect(
+                'local_quickcards/allowedcohorts',
+                get_string('setting_allowedcohorts', 'local_quickcards'),
+                get_string('setting_allowedcohorts_desc', 'local_quickcards'),
+                [],
+                $cohortchoices
+            ));
+        } else {
+            $settings->add(new admin_setting_description(
+                'local_quickcards/allowedcohorts_empty',
+                get_string('setting_allowedcohorts', 'local_quickcards'),
+                get_string('setting_nocohorts', 'local_quickcards')
+            ));
+        }
     }
 }

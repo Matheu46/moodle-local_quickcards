@@ -173,7 +173,11 @@ $string['unsupportedversion'] = 'Unsupported export file version: {$a}.';
 // Admin settings.
 $string['setting_enabled'] = 'Enable QuickCards';
 $string['setting_enabled_desc'] = 'If enabled, users with permission can access their flashcards and spaced repetition study sessions. If disabled, the entire plugin is deactivated.';
+$string['setting_allowedcohorts'] = 'Allowed cohorts';
+$string['setting_allowedcohorts_desc'] = 'Restrict QuickCards access to members of the selected cohorts. Leave empty to allow all authenticated users with permission. Site administrators always retain access.';
+$string['setting_nocohorts'] = 'No cohorts exist on this site yet. Create cohorts in Site administration > Users > Accounts > Cohorts to restrict access by cohort. Currently, all users with permission can access QuickCards.';
 $string['plugindisabled'] = 'QuickCards is currently disabled on this site.';
+$string['accessrestricted'] = 'Access to QuickCards is currently restricted to specific cohorts.';
 
 // Privacy.
 $string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';
