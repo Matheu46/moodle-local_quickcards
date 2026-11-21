@@ -179,5 +179,29 @@ $string['setting_nocohorts'] = 'No cohorts exist on this site yet. Create cohort
 $string['plugindisabled'] = 'QuickCards is currently disabled on this site.';
 $string['accessrestricted'] = 'Access to QuickCards is currently restricted to specific cohorts.';
 
-// Privacy.
+// Privacy API metadata and descriptions.
 $string['privacy:metadata'] = 'QuickCards stores user flashcards, decks, and spaced repetition review intervals.';
+$string['privacy:metadata:local_quickcards_decks'] = 'Stores flashcard decks created by users.';
+$string['privacy:metadata:local_quickcards_decks:userid'] = 'The ID of the user who owns the deck.';
+$string['privacy:metadata:local_quickcards_decks:courseid'] = 'The ID of the course linked to the deck, or 0 for general decks.';
+$string['privacy:metadata:local_quickcards_decks:name'] = 'The name of the flashcard deck.';
+$string['privacy:metadata:local_quickcards_decks:description'] = 'The description or topic summary of the flashcard deck.';
+$string['privacy:metadata:local_quickcards_decks:timecreated'] = 'The timestamp when the deck was created.';
+$string['privacy:metadata:local_quickcards_decks:timemodified'] = 'The timestamp when the deck was last modified.';
+
+$string['privacy:metadata:local_quickcards_cards'] = 'Stores individual flashcards within decks.';
+$string['privacy:metadata:local_quickcards_cards:deckid'] = 'The ID of the deck to which the flashcard belongs.';
+$string['privacy:metadata:local_quickcards_cards:userid'] = 'The ID of the user who created the flashcard.';
+$string['privacy:metadata:local_quickcards_cards:question'] = 'The question or prompt on the front of the flashcard.';
+$string['privacy:metadata:local_quickcards_cards:answer'] = 'The answer or explanation on the back of the flashcard.';
+$string['privacy:metadata:local_quickcards_cards:timecreated'] = 'The timestamp when the card was created.';
+$string['privacy:metadata:local_quickcards_cards:timemodified'] = 'The timestamp when the card was last modified.';
+
+$string['privacy:metadata:local_quickcards_reviews'] = 'Stores spaced repetition study progress and review history per card and user.';
+$string['privacy:metadata:local_quickcards_reviews:cardid'] = 'The ID of the card reviewed.';
+$string['privacy:metadata:local_quickcards_reviews:userid'] = 'The ID of the user who performed the study session.';
+$string['privacy:metadata:local_quickcards_reviews:easefactor'] = 'The SuperMemo SM-2 ease factor determining review interval growth.';
+$string['privacy:metadata:local_quickcards_reviews:intervaldays'] = 'The number of days until the next scheduled review.';
+$string['privacy:metadata:local_quickcards_reviews:repetitions'] = 'The count of consecutive successful reviews.';
+$string['privacy:metadata:local_quickcards_reviews:nextreview'] = 'The timestamp when the card is next due for review.';
+$string['privacy:metadata:local_quickcards_reviews:lastreview'] = 'The timestamp of the most recent review session.';
